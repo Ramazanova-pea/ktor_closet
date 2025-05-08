@@ -1,6 +1,7 @@
 package ru.fanofstars
 
 import io.ktor.server.application.*
+import kotlinx.io.files.SystemFileSystem
 import org.jetbrains.exposed.sql.Database
 import ru.fanofstars.debug.configureDebugRoutes
 import ru.fanofstars.login.configureLoginRouting
@@ -12,7 +13,6 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     configureSerialization()
-    configureDatabases()
     configureTemplating()
     configureHTTP()
     configureSecurity()
@@ -23,9 +23,8 @@ fun Application.module() {
     configureLoginRouting()
 
     Database.connect(
-        url = "jdbc:postgresql://localhost:5432/closetdb",
-        driver = "org.postgresql.Driver",
-        user = "myuser",
-        password = "mypassword"
+        url = System.getenv("DB_URL"),
+        user = System.getenv("DB_USER"),
+        password = System.getenv("DB_PASSWORD")
     )
 }

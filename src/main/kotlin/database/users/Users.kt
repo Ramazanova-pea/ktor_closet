@@ -1,7 +1,7 @@
 package ru.fanofstars.database.users
 
 
-import org.h2.engine.User
+
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table

@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  closet-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: closet-server
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./application.yaml:/app/application.yaml
+      - ./closet-server-all.jar:/app/app.jar
+    restart: unless-stopped

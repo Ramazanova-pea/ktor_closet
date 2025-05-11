@@ -17,10 +17,19 @@ class RegisterController(val call: ApplicationCall) {
         val registerReceiveRemote = call.receive<RegisterReceiveRemote>()
         if (!registerReceiveRemote.email.isValidEmail()) {
             call.respond(HttpStatusCode.BadRequest, "Email is not valid")
+            return
         }
+        if (registerReceiveRemote.login.isBlank() ||
+            registerReceiveRemote.password.isBlank() ||
+            registerReceiveRemote.username.isBlank()) {
+            call.respond(HttpStatusCode.BadRequest, "All fields must be filled")
+            return
+        }
+
         val userDTO = Users.fetchUser(registerReceiveRemote.login)
         if (userDTO != null) {
             call.respond(HttpStatusCode.Conflict, "User already exists")
+            return
         } else {
             val token = UUID.randomUUID().toString()
             try {
@@ -34,6 +43,7 @@ class RegisterController(val call: ApplicationCall) {
                 )
             } catch (e: ExposedSQLException) {
                 call.respond(HttpStatusCode.Conflict, "User already exists")
+                return
             }
             Tokens.insert(
                 TokenDTO(

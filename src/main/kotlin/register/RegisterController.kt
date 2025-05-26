@@ -7,16 +7,12 @@ import io.ktor.server.response.respond
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import ru.fanofstars.database.users.UserDTO
 import ru.fanofstars.database.users.Users
-import ru.fanofstars.utils.isValidEmail
 import java.util.UUID
 
 class RegisterController(val call: ApplicationCall) {
     suspend fun registerNewUser() {
         val registerReceiveRemote = call.receive<RegisterReceiveRemote>()
-        if (!registerReceiveRemote.email.isValidEmail()) {
-            call.respond(HttpStatusCode.BadRequest, "Email is not valid")
-            return
-        }
+
         if (registerReceiveRemote.login.isBlank() ||
             registerReceiveRemote.password.isBlank() ||
             registerReceiveRemote.username.isBlank()) {

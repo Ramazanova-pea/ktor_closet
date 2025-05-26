@@ -7,9 +7,6 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
-import ru.fanofstars.cache.InMemoryCache
-import ru.fanofstars.cache.TokenCache
-import java.util.UUID
 
 fun Application.configureLoginRouting() {
 

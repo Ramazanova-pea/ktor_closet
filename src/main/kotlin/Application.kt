@@ -1,10 +1,7 @@
 package ru.fanofstars
 
 import io.ktor.server.application.*
-import io.ktor.server.routing.routing
-import kotlinx.io.files.SystemFileSystem
 import org.jetbrains.exposed.sql.Database
-import ru.fanofstars.cache.InMemoryCache
 import ru.fanofstars.debug.configureDebugRoutes
 import ru.fanofstars.login.configureLoginRouting
 import ru.fanofstars.register.configureRegisterRouting

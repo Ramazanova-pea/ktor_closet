@@ -3,6 +3,7 @@ package ru.fanofstars.database.users
 
 
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
@@ -25,23 +26,26 @@ object Users: Table("users") {
                 it[login] = userDTO.login
                 it[password] = userDTO.password
                 it[username] = userDTO.username
-                it[email] = userDTO.email ?: ""
+                it[email] = userDTO.email
             }
         }
     }
 
     fun fetchUser(login: String): UserDTO? {
         return try{
+            val condition = Op.build { Users.login eq login }
             transaction {
-                Users.selectAll().where { Users.login eq login }.singleOrNull()?.let{ row ->
-                    UserDTO(
-                        id_user = row[Users.id_user],
-                        login = row[Users.login],
-                        password = row[password],
-                        username = row[username],
-                        email = row[email]
-                    )
-                }
+                Users.select(condition)
+                    .singleOrNull()
+                    ?.let { row ->
+                        UserDTO(
+                            id_user = row[Users.id_user],
+                            login = row[Users.login],
+                            password = row[Users.password],
+                            username = row[Users.username],
+                            email = row[Users.email]
+                        )
+                    }
             }
         } catch (e: Exception) {
             null

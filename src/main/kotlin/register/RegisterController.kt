@@ -32,8 +32,8 @@ class RegisterController(val call: ApplicationCall) {
                         id_user = UUID.randomUUID().toString(),
                         login = registerReceiveRemote.login,
                         password = registerReceiveRemote.password,
-                        email = registerReceiveRemote.email,
                         username = registerReceiveRemote.username,
+                        email = registerReceiveRemote.email,
                         token = token
                     )
                 )

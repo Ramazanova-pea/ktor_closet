@@ -2,6 +2,7 @@ package users
 
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
+import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
@@ -13,7 +14,9 @@ import ru.fanofstars.database.users.Users
 fun Application.configureUsersRouting() {
     routing {
         post("/getUserByToken") {
-            val token = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+            val request = call.receive<Map<String, String>>()
+
+            val token = request["token"]
 
             if (token.isNullOrBlank()) {
                 call.respond(HttpStatusCode.BadRequest, "Token is missing")
@@ -27,7 +30,8 @@ fun Application.configureUsersRouting() {
                     "id_user" to it[Users.id_user],
                     "login" to it[Users.login],
                     "username" to it[Users.username],
-                    "email" to it[Users.email]
+                    "email" to it[Users.email],
+                    "password" to it[Users.password],
                 )
             }.singleOrNull()
 

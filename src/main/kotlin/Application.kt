@@ -1,6 +1,7 @@
 package ru.fanofstars
 
 import io.ktor.server.application.*
+import io.ktor.server.routing.routing
 import kotlinx.io.files.SystemFileSystem
 import org.jetbrains.exposed.sql.Database
 import ru.fanofstars.debug.configureDebugRoutes
@@ -19,10 +20,13 @@ fun Application.module() {
     configureSecurity()
     configureRouting()
 
-    configureRegisterRouting()
-    configureDebugRoutes()
-    configureLoginRouting()
-    configureTagsRouting()
+    routing {
+        configureRegisterRouting()
+        configureDebugRoutes()
+        configureLoginRouting()
+        configureTagsRouting()
+    }
+
 
     Database.connect(
         url = System.getenv("DB_URL"),

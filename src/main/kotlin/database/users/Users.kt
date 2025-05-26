@@ -46,15 +46,17 @@ object Users: Table("users") {
     }
 
     fun fetchUser(login: String): UserDTO? {
-        return try{
-            val condition = Op.build { Users.login eq login }
-            println(condition)
+        return try {
             transaction {
                 addLogger(StdOutSqlLogger) // Добавляем логгер ВНУТРИ транзакции
-                val selectStatement = Users.select(condition)
-                println("SQL Query: ${selectStatement.toString()}") // Логируем запрос
+
+                // Используем selectAll() и затем фильтруем с помощью where
+                val selectStatement = Users.selectAll().where { Users.login eq login }
+                println("SQL Query: ${selectStatement.prepareSQL(this)}") // Логируем SQL запрос
+
                 val result = selectStatement.singleOrNull()
-                println("Result: $result") // Log the result
+                println("Result: $result") // Логируем результат
+
                 result?.let { row ->
                     UserDTO(
                         id_user = row[Users.id_user],
@@ -62,11 +64,12 @@ object Users: Table("users") {
                         password = row[Users.password],
                         username = row[Users.username],
                         email = row[Users.email],
-                        token = row[token]
+                        token = row[Users.token] // Убедитесь, что Users.token существует в вашем объекте Table
                     )
                 }
             }
         } catch (e: Exception) {
+            println("Error fetching user: ${e.message}") // Логируем ошибку
             null
         }
     }

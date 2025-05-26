@@ -29,10 +29,10 @@ fun Application.configureDebugRoutes() {
 }
 
 object Users : Table() {
-    val id_user = integer("id_user").autoIncrement()
+    val id_user = varchar("id_user", 50).autoIncrement()
     val username = varchar("username", 255)
     override val primaryKey = PrimaryKey(id_user)
 }
 
-data class UserDto(val id: Int, val username: String)
+data class UserDto(val id: String, val username: String)
 

@@ -12,12 +12,15 @@ import ru.fanofstars.cache.TokenCache
 import ru.fanofstars.utils.isValidEmail
 import java.util.UUID
 
-fun Route.configureRegisterRouting() {
+fun Application.configureRegisterRouting() {
 
-    post("/register") {
-        val registerController = RegisterController(call)
-        registerController.registerNewUser()
+    routing {
+        post("/register") {
+            val registerController = RegisterController(call)
+            registerController.registerNewUser()
+        }
     }
+
 
 }
 

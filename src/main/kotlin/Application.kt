@@ -20,12 +20,12 @@ fun Application.module() {
     configureSecurity()
     configureRouting()
 
-    routing {
-        configureRegisterRouting()
-        configureDebugRoutes()
-        configureLoginRouting()
-        configureTagsRouting()
-    }
+
+    configureRegisterRouting()
+    configureDebugRoutes()
+    configureLoginRouting()
+    configureTagsRouting()
+
 
 
     Database.connect(

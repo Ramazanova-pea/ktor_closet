@@ -8,11 +8,14 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import ru.fanofstars.register.RegisterController
 
-fun Route.configureTagsRouting() {
-    post("/create-tags") {
-        TagsController(call).createNewTag()
-    }
-    get("/create-tags") {
-        call.respond("Tags")
+fun Application.configureTagsRouting() {
+    routing {
+        post("/create-tags") {
+            TagsController(call).createNewTag()
+        }
+        get("/create-tags") {
+            call.respond("Tags")
+        }
     }
 }
+

@@ -11,11 +11,14 @@ import ru.fanofstars.cache.InMemoryCache
 import ru.fanofstars.cache.TokenCache
 import java.util.UUID
 
-fun Route.configureLoginRouting() {
+fun Application.configureLoginRouting() {
 
-    post("/login") {
-        val loginController = LoginController(call)
-        loginController.performLogin()
+    routing {
+        post("/login") {
+            val loginController = LoginController(call)
+            loginController.performLogin()
+        }
     }
+
 
 }

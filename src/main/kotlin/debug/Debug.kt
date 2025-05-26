@@ -10,19 +10,22 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.fanofstars.cache.InMemoryCache
 
-fun Route.configureDebugRoutes() {
+fun Application.configureDebugRoutes() {
 
-    get("/debug/users") {
-        val users = transaction {
-            Users.selectAll().map {
-                UserDto(
-                    id = it[Users.id],
-                    name = it[Users.name]
-                )
+    routing {
+        get("/debug/users") {
+            val users = transaction {
+                Users.selectAll().map {
+                    UserDto(
+                        id = it[Users.id],
+                        name = it[Users.name]
+                    )
+                }
             }
+            call.respond(users)
         }
-        call.respond(users)
     }
+
 
 }
 

@@ -2,10 +2,13 @@ package ru.fanofstars.database.users
 
 
 
+import org.jetbrains.annotations.Debug
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -45,19 +48,23 @@ object Users: Table("users") {
     fun fetchUser(login: String): UserDTO? {
         return try{
             val condition = Op.build { Users.login eq login }
+            println(condition)
             transaction {
-                Users.select(condition)
-                    .singleOrNull()
-                    ?.let { row ->
-                        UserDTO(
-                            id_user = row[Users.id_user],
-                            login = row[Users.login],
-                            password = row[Users.password],
-                            username = row[Users.username],
-                            email = row[Users.email],
-                            token = row[token]
-                        )
-                    }
+                addLogger(StdOutSqlLogger) // Добавляем логгер ВНУТРИ транзакции
+                val selectStatement = Users.select(condition)
+                println("SQL Query: ${selectStatement.toString()}") // Логируем запрос
+                val result = selectStatement.singleOrNull()
+                println("Result: $result") // Log the result
+                result?.let { row ->
+                    UserDTO(
+                        id_user = row[Users.id_user],
+                        login = row[Users.login],
+                        password = row[Users.password],
+                        username = row[Users.username],
+                        email = row[Users.email],
+                        token = row[token]
+                    )
+                }
             }
         } catch (e: Exception) {
             null

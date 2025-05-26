@@ -30,7 +30,7 @@ fun Application.configureDebugRoutes() {
 
 object Users : Table() {
     val id_user = varchar("id_user", 50).autoIncrement()
-    val username = varchar("username", 255)
+    val username = varchar("username", 30)
     override val primaryKey = PrimaryKey(id_user)
 }
 

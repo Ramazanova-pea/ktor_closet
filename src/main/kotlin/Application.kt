@@ -9,6 +9,7 @@ import ru.fanofstars.debug.configureDebugRoutes
 import ru.fanofstars.login.configureLoginRouting
 import ru.fanofstars.register.configureRegisterRouting
 import tags.configureTagsRouting
+import users.configureUsersRouting
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -27,6 +28,7 @@ fun Application.module() {
     configureDebugRoutes()
     configureLoginRouting()
     configureTagsRouting()
+    configureUsersRouting()
 
 
 

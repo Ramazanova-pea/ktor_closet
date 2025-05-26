@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 
 object Users: Table("users") {
     val id_user = varchar("id_user", 50)
@@ -16,6 +17,7 @@ object Users: Table("users") {
     val password = varchar("password", 25)
     val username =  varchar("username", 30)
     val email = varchar("email", 30)
+    val token = varchar("token", 50).nullable() // новое поле
 
     override val primaryKey = PrimaryKey(id_user)
 
@@ -27,6 +29,15 @@ object Users: Table("users") {
                 it[password] = userDTO.password
                 it[username] = userDTO.username
                 it[email] = userDTO.email
+                it[token] = userDTO.token
+            }
+        }
+    }
+
+    fun updateToken(loginValue: String, newToken: String) {
+        transaction {
+            Users.update({ login eq loginValue }) {
+                it[token] = newToken
             }
         }
     }
@@ -43,7 +54,8 @@ object Users: Table("users") {
                             login = row[Users.login],
                             password = row[Users.password],
                             username = row[Users.username],
-                            email = row[Users.email]
+                            email = row[Users.email],
+                            token = row[token]
                         )
                     }
             }

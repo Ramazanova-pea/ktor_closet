@@ -5,8 +5,6 @@ import io.ktor.server.application.ApplicationCall
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import org.jetbrains.exposed.exceptions.ExposedSQLException
-import ru.fanofstars.database.tokens.TokenDTO
-import ru.fanofstars.database.tokens.Tokens
 import ru.fanofstars.database.users.UserDTO
 import ru.fanofstars.database.users.Users
 import ru.fanofstars.utils.isValidEmail
@@ -38,23 +36,19 @@ class RegisterController(val call: ApplicationCall) {
                         id_user = UUID.randomUUID().toString(),
                         login = registerReceiveRemote.login,
                         password = registerReceiveRemote.password,
-                        email = registerReceiveRemote.email ?: "",
-                        username = registerReceiveRemote.username
+                        email = registerReceiveRemote.email,
+                        username = registerReceiveRemote.username,
+                        token = token
                     )
                 )
+                call.respond(RegisterResponseRemote(token = token))
             } catch (e: ExposedSQLException) {
                 e.printStackTrace()
                 call.respond(HttpStatusCode.Conflict, "Ошибка вставки: ${e.message}")
             }
 
-            Tokens.insert(
-                TokenDTO(
-                    rowId = UUID.randomUUID().toString(),
-                    login = registerReceiveRemote.login,
-                    token = token
-                )
-            )
-            call.respond(RegisterResponseRemote(token = token))
+
+
         }
     }
 }

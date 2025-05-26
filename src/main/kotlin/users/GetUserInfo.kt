@@ -25,15 +25,18 @@ fun Application.configureUsersRouting() {
 
             val selectStatement = Users.selectAll().where { Users.token eq token }
 
-            val user = selectStatement.map {
-                mapOf(
-                    "id_user" to it[Users.id_user],
-                    "login" to it[Users.login],
-                    "username" to it[Users.username],
-                    "email" to it[Users.email],
-                    "password" to it[Users.password],
-                )
-            }.singleOrNull()
+            val user = transaction {
+                val selectStatement = Users.selectAll().where { Users.token eq token }
+
+                selectStatement.map {
+                    mapOf(
+                        "id_user" to it[Users.id_user],
+                        "login" to it[Users.login],
+                        "username" to it[Users.username],
+                        "email" to it[Users.email]
+                    )
+                }.singleOrNull()
+            }
 
             if (user == null) {
                 call.respond(HttpStatusCode.Unauthorized, "Invalid token")

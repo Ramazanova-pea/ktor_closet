@@ -43,9 +43,10 @@ class RegisterController(val call: ApplicationCall) {
                     )
                 )
             } catch (e: ExposedSQLException) {
-                call.respond(HttpStatusCode.Conflict, "User already exists")
-                return
+                e.printStackTrace()
+                call.respond(HttpStatusCode.Conflict, "Ошибка вставки: ${e.message}")
             }
+
             Tokens.insert(
                 TokenDTO(
                     rowId = UUID.randomUUID().toString(),

@@ -17,7 +17,7 @@ fun Application.configureDebugRoutes() {
                 Users.selectAll().map {
                     UserDto(
                         id = it[Users.id_user],
-                        name = it[Users.name]
+                        username = it[Users.username]
                     )
                 }
             }
@@ -30,9 +30,9 @@ fun Application.configureDebugRoutes() {
 
 object Users : Table() {
     val id_user = integer("id_user").autoIncrement()
-    val name = varchar("name", 255)
+    val username = varchar("username", 255)
     override val primaryKey = PrimaryKey(id_user)
 }
 
-data class UserDto(val id: Int, val name: String)
+data class UserDto(val id: Int, val username: String)
 

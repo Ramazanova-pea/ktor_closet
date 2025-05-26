@@ -6,6 +6,7 @@ import org.jetbrains.exposed.sql.Database
 import ru.fanofstars.debug.configureDebugRoutes
 import ru.fanofstars.login.configureLoginRouting
 import ru.fanofstars.register.configureRegisterRouting
+import tags.configureTagsRouting
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -21,6 +22,7 @@ fun Application.module() {
     configureRegisterRouting()
     configureDebugRoutes()
     configureLoginRouting()
+    configureTagsRouting()
 
     Database.connect(
         url = System.getenv("DB_URL"),

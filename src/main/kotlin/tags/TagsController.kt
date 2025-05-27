@@ -35,6 +35,18 @@ class TagsController(val call: ApplicationCall) {
 
         call.respond(HttpStatusCode.Created, Tags(id_tags = newId, name = tagRequest.name))
     }
+
+    suspend fun getAllTags() {
+        val tags = transaction {
+            TagsTable.selectAll().map {
+                Tags(
+                    id_tags = it[TagsTable.idTags],
+                    name = it[TagsTable.name]
+                )
+            }
+        }
+        call.respond(HttpStatusCode.OK, tags)
+    }
 }
 
 object TagsTable : Table("tags") {

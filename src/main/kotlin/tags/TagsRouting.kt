@@ -16,6 +16,10 @@ fun Application.configureTagsRouting() {
         get("/create-tags") {
             call.respond("Tags")
         }
+
+        get("/tags") {
+            TagsController(call).getAllTags()
+        }
     }
 }
 

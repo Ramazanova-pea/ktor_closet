@@ -8,8 +8,11 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import item.ItemsTable
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 
@@ -18,20 +21,35 @@ fun Application.configureLookRoutes() {
         post("/createLook") {
             val request = call.receive<CreateLookRequest>()
 
+            val itemIds: List<String> = try {
+                transaction {
+                    val ids = ItemsTable
+                        .selectAll()
+                        .where { ItemsTable.name inList request.items }
+                        .map { it[ItemsTable.idItem] }
 
-            // Генерируем id_look
+                    if (ids.size != request.items.size) {
+                        throw IllegalArgumentException("Some items not found by name")
+                    }
+
+                    ids
+                }
+            } catch (e: IllegalArgumentException) {
+                return@post call.respond(HttpStatusCode.BadRequest, e.message ?: "Error")
+            }
+
             val lookId = UUID.randomUUID().toString()
 
             transaction {
-                // Вставляем новый образ
+                // Создаем запись в таблице look
                 LookTable.insert {
                     it[idLook] = lookId
                     it[name] = request.name
                     it[notes] = request.notes
                 }
 
-                // Вставляем записи в itemInLook
-                request.items.forEach { itemId ->
+                // Вставляем элементы в itemInLook
+                itemIds.forEach { itemId ->
                     ItemInLookTable.insert {
                         it[idIil] = UUID.randomUUID().toString()
                         it[idLook] = lookId
@@ -42,6 +60,7 @@ fun Application.configureLookRoutes() {
 
             call.respond(HttpStatusCode.Created, mapOf("id_look" to lookId))
         }
+
 
     }
 }

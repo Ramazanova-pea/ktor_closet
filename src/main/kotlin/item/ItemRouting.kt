@@ -6,7 +6,6 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
@@ -41,7 +40,7 @@ fun Application.configureItemRouting() {
                 // Создаем запись в item
                 ItemsTable.insert {
                     it[idItem] = itemId
-                    it[picture] = request.imagePath // или путь, если это поле текстовое
+                    it[picture_path] = request.imagePath // или путь, если это поле текстовое
                     it[name] = request.name
                     it[notes] = request.notes
                     it[idUser] = userId
@@ -73,7 +72,7 @@ fun Application.configureItemRouting() {
 
 object ItemsTable : Table("item") {
     val idItem = varchar("id_item", 50)
-    val picture = varchar("picture", 255) // если путь
+    val picture_path = varchar("picture_path", 255) // если путь
     val name = varchar("name", 25)
     val notes = text("notes").nullable()
     val idUser = varchar("id_user", 50).references(Users.id_user)

@@ -6,6 +6,7 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
@@ -65,6 +66,58 @@ fun Application.configureItemRouting() {
             }
 
             call.respond(HttpStatusCode.Created, mapOf("id_item" to itemId))
+        }
+
+
+        // Новый эндпоинт получения всех item для пользователя
+        post("/getItems") {
+            val request = call.receive<Map<String, String>>()
+            val token = request["token"]
+
+            if (token.isNullOrBlank()) {
+                return@post call.respond(HttpStatusCode.BadRequest, "Token is missing")
+            }
+
+            val items = transaction {
+                val userId = Users.selectAll()
+                    .where { Users.token eq token }
+                    .map { it[Users.id_user] }
+                    .singleOrNull()
+
+                if (userId == null) {
+                    return@transaction null
+                }
+
+                ItemsTable.selectAll()
+                    .where { ItemsTable.idUser eq userId }
+                    .map { row ->
+                        val itemId = row[ItemsTable.idItem]
+
+                        val itemTags = ItemTagsTable
+                            .selectAll()
+                            .where { ItemTagsTable.idItem eq itemId }
+                            .mapNotNull { tagRow ->
+                                TagsTable.selectAll()
+                                    .where { TagsTable.idTags eq tagRow[ItemTagsTable.idTags] }
+                                    .mapNotNull { tag -> tag[TagsTable.name] }
+                                    .singleOrNull()
+                            }
+
+                        mapOf(
+                            "id_item" to itemId,
+                            "name" to row[ItemsTable.name],
+                            "notes" to row[ItemsTable.notes],
+                            "imagePath" to row[ItemsTable.picture_path],
+                            "tags" to itemTags
+                        )
+                    }
+            }
+
+            if (items == null) {
+                return@post call.respond(HttpStatusCode.Unauthorized, "Invalid token")
+            }
+
+            call.respond(HttpStatusCode.OK, items)
         }
 
     }

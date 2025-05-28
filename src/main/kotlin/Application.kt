@@ -1,6 +1,7 @@
 package ru.fanofstars
 
 import io.ktor.server.application.*
+import item.configureItemRouting
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
@@ -29,6 +30,7 @@ fun Application.module() {
     configureLoginRouting()
     configureTagsRouting()
     configureUsersRouting()
+    configureItemRouting()
 
 
 

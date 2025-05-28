@@ -10,10 +10,12 @@ import io.ktor.server.routing.routing
 import item.ItemsTable
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
+import ru.fanofstars.database.users.Users
 import java.util.UUID
 
 fun Application.configureLookRoutes() {
@@ -61,7 +63,64 @@ fun Application.configureLookRoutes() {
             call.respond(HttpStatusCode.Created, mapOf("id_look" to lookId))
         }
 
+        post("/getLooks") {
+            val request = call.receive<Map<String, String>>()
+            val token = request["token"]
 
+            if (token.isNullOrBlank()) {
+                return@post call.respond(HttpStatusCode.BadRequest, "Token is missing")
+            }
+
+            val looks = transaction {
+                val userId = Users
+                    .selectAll()
+                    .where { Users.token eq token }
+                    .map { it[Users.id_user] }
+                    .singleOrNull()
+
+                if (userId == null) {
+                    return@transaction null
+                }
+
+                // Получаем все луки
+                LookTable.selectAll()
+                    .map { lookRow ->
+                        val lookId = lookRow[LookTable.idLook]
+
+                        // Находим id_item для этого id_look
+                        val itemIds = ItemInLookTable
+                            .selectAll()
+                            .where { ItemInLookTable.idLook eq lookId }
+                            .map { it[ItemInLookTable.idItem] }
+
+                        // Получаем подробную информацию об этих items
+                        val items = ItemsTable
+                            .selectAll()
+                            .where { (ItemsTable.idItem inList itemIds) and (ItemsTable.idUser eq userId) }
+                            .map { itemRow ->
+                                mapOf(
+                                    "id_item" to itemRow[ItemsTable.idItem],
+                                    "name" to itemRow[ItemsTable.name],
+                                    "notes" to itemRow[ItemsTable.notes],
+                                    "imagePath" to itemRow[ItemsTable.picture_path]
+                                )
+                            }
+
+                        mapOf(
+                            "id_look" to lookId,
+                            "name" to lookRow[LookTable.name],
+                            "notes" to lookRow[LookTable.notes],
+                            "items" to items
+                        )
+                    }
+            }
+
+            if (looks == null) {
+                return@post call.respond(HttpStatusCode.Unauthorized, "Invalid token")
+            }
+
+            call.respond(HttpStatusCode.OK, looks)
+        }
     }
 }
 

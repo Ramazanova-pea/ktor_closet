@@ -23,8 +23,6 @@ fun Application.configureUsersRouting() {
                 return@post
             }
 
-            val selectStatement = Users.selectAll().where { Users.token eq token }
-
             val user = transaction {
                 val selectStatement = Users.selectAll().where { Users.token eq token }
 
